@@ -12,6 +12,8 @@ public:
 
     char get_current_player() const;
 
+    short get_valid_move() const;
+
     bool make_move(short position);
 
     void switch_player();

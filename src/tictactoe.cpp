@@ -1,5 +1,7 @@
 #include <string>
 #include "tictactoe.hpp"
+#include <limits>
+#include <iostream>
 
 // Your code goes here
 TicTacToe::TicTacToe() {
@@ -8,6 +10,17 @@ TicTacToe::TicTacToe() {
 
 char TicTacToe::get_current_player() const {
     return current_player;
+}
+
+short TicTacToe::get_valid_move() const {
+    short move;
+
+    while(!(std::cin >> move)) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Invalid input. Please enter a number from 1-9:";
+    }
+    return move;
 }
 
 bool TicTacToe::make_move(short position) {

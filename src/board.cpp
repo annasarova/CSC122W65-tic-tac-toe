@@ -6,7 +6,6 @@ Board::Board() {
 }
 
 void Board::display() const {
-    std::cout << "\n";
     std::cout << " " << cells[0] << " | " << cells[1] << " | " << cells[2] << "\n";
     std::cout << "---+---+---\n";
     std::cout << " " << cells[3] << " | " << cells[4] << " | " << cells[5] << "\n";
