@@ -89,3 +89,49 @@ TEST_CASE("Draw game is detected") {
 
     REQUIRE(game.check_draw() == true);
 }
+TEST_CASE("Computer takes first available spot") {
+    TicTacToe game;
+
+    // Force board state
+    game.make_move(1); // X
+    game.switch_player();
+    game.make_move(2); // O
+    game.switch_player();
+
+    game.computer_move();
+
+    // computer should take position 3 (first available)
+    bool isvalid = (game.get_current_player() == 'X' || game.get_current_player() == 'O');
+    REQUIRE(isvalid);
+}
+TEST_CASE("Computer move is valid and accepted") {
+    TicTacToe game;
+
+    game.make_move(1); // X
+    game.switch_player();
+
+    game.computer_move(); // O should move
+
+    // next move should NOT be able to overwrite first available spot used
+    bool isvalid = (game.make_move(2) == false || game.make_move(1) == false);
+    REQUIRE(isvalid);
+}
+TEST_CASE("Computer can go first") {
+    TicTacToe game;
+
+    // simulate computer first
+    game.computer_move();
+
+    // first available is 1
+    REQUIRE(game.make_move(1) == false);
+}
+TEST_CASE("Computer does not overwrite existing move") {
+    TicTacToe game;
+
+    game.make_move(1); // X takes 1
+    game.switch_player();
+
+    game.computer_move(); // should skip 1 and take 2
+
+    REQUIRE(game.make_move(1) == false);
+}

@@ -1,7 +1,23 @@
 #include <string>
 #include "tictactoe.hpp"
-#include <limits>
 #include <iostream>
+#include <cctype>
+
+//helper function to trim string
+static std::string trim(const std::string& str) {
+    size_t start = 0;
+    size_t end = str.length();
+
+    while(start < end && std::isspace(str[start])) {
+        start++;
+    }
+
+    while(end > start && std::isspace(str[end - 1])) {
+        end--;
+    }
+
+    return str.substr(start, end - start);
+}
 
 // Your code goes here
 TicTacToe::TicTacToe() {
@@ -13,12 +29,42 @@ char TicTacToe::get_current_player() const {
 }
 
 short TicTacToe::get_valid_move() const {
-    short move;
+    std::string input;
+    short move = -1;
+    bool valid = false;
 
-    while(!(std::cin >> move)) {
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::cout << "Invalid input. Please enter a number from 1-9:";
+    while(!valid) {
+        std::getline(std::cin, input);
+
+        input = trim(input);
+
+        valid = true;
+
+        if(input.empty()) {
+            valid = false;
+        }
+        else {
+            try {
+                size_t pos;
+                short temp = static_cast<short>(std::stoi(input, &pos));
+
+                // ensure no extra characters (e.g. "5 6")
+                if(pos != input.length()) {
+                    valid = false;
+                }
+                else {
+                    move = temp;
+                }
+            }
+            catch (...) {
+                valid = false;
+            }
+        }
+
+        if (!valid) {
+            std::cout<<"Invalid input. Please enter a number from 1-9:";
+            move =  -1;
+        }
     }
     return move;
 }
@@ -74,4 +120,13 @@ bool TicTacToe::check_win() const {
     }
 
     return win;
+}
+
+void TicTacToe::computer_move() {
+    for(short i = 0; i <= 9; i++) {
+        if(board.is_valid_move(i)) {
+            board.place_mark(i, current_player);
+            return;
+        }
+    }
 }

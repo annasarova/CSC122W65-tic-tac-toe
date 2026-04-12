@@ -23,4 +23,6 @@ public:
     bool check_draw() const;
 
     void display_board() const;
+
+    void computer_move();
 };
