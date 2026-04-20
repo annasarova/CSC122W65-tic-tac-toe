@@ -16,8 +16,14 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Catch2)
 
 add_executable(tictactoe_test tests/tictactoe_test.cpp src/tictactoe.cpp
-        src/board.cpp)
+        src/board.cpp src/player.cpp src/humanplayer.cpp src/computerplayer.cpp)
 add_executable(main main.cpp src/tictactoe.cpp
-        src/board.cpp)
+        src/board.cpp
+        src/player.hpp
+        src/player.cpp
+        src/humanplayer.hpp
+        src/humanplayer.cpp
+        src/computerplayer.hpp
+        src/computerplayer.cpp)
 
 target_link_libraries(tictactoe_test PRIVATE Catch2::Catch2WithMain)

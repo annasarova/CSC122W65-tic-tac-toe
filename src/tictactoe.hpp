@@ -1,18 +1,22 @@
 #include <string>
 #include "board.hpp"
+#include "player.hpp"
 
 // Your functions go here
 class TicTacToe {
 private:
     Board board;
-    char current_player;
+    Player* player1;
+    Player* player2;
+    Player* current_player;
+    Player* last_player;
 
 public:
-    TicTacToe();
+    TicTacToe(Player* p1, Player* p2);
 
-    char get_current_player() const;
+    Player* get_last_player() const;
 
-    short get_valid_move() const;
+    void display_board() const;
 
     bool make_move(short position);
 
@@ -22,7 +26,5 @@ public:
 
     bool check_draw() const;
 
-    void display_board() const;
-
-    void computer_move();
+    bool play_turn();
 };

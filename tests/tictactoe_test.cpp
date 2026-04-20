@@ -4,134 +4,125 @@
 #include <catch2/generators/catch_generators_range.hpp>
 
 #include "../src/tictactoe.hpp"
-
-TEST_CASE("Initial player is X") {
-    TicTacToe game;
-    REQUIRE(game.get_current_player() == 'X');
-}
+#include "../src/humanplayer.hpp"
+#include "../src/computerplayer.hpp"
 
 TEST_CASE("Valid moves are accepted") {
-    TicTacToe game;
+    HumanPlayer p1('X');
+    HumanPlayer p2('O');
+    TicTacToe game(&p1, &p2);
+
     REQUIRE(game.make_move(1) == true);
+    game.switch_player();
     REQUIRE(game.make_move(5) == true);
 }
 
 TEST_CASE("Invalid moves are rejected") {
-    TicTacToe game;
-    game.make_move(1); // X takes position 1
-    REQUIRE(game.make_move(1) == false); // Cannot overwrite
-    REQUIRE(game.make_move(0) == false); // Invalid position
-    REQUIRE(game.make_move(10) == false); // Invalid position
+    HumanPlayer p1('X');
+    HumanPlayer p2('O');
+    TicTacToe game(&p1, &p2);
+
+    game.make_move(1);
+    REQUIRE(game.make_move(1) == false);
+    REQUIRE(game.make_move(0) == false);
+    REQUIRE(game.make_move(10) == false);
 }
 
-TEST_CASE("Player switching works correctly") {
-    TicTacToe game;
-    REQUIRE(game.get_current_player() == 'X');
+TEST_CASE("Player switching works") {
+    HumanPlayer p1('X');
+    HumanPlayer p2('O');
+    TicTacToe game(&p1, &p2);
+
+    game.make_move(1); // X
     game.switch_player();
-    REQUIRE(game.get_current_player() == 'O');
-    game.switch_player();
-    REQUIRE(game.get_current_player() == 'X');
+    game.make_move(2); // O
+
+    REQUIRE(game.get_last_player()->get_symbol() == 'O');
 }
 
 TEST_CASE("Horizontal win is detected") {
-    TicTacToe game;
-    // X takes top row
-    game.make_move(1);
-    game.make_move(4); // O
-    game.make_move(2);
-    game.make_move(5); // O
-    game.make_move(3); // X wins
+    HumanPlayer p1('X');
+    HumanPlayer p2('O');
+    TicTacToe game(&p1, &p2);
+
+    game.make_move(1); game.switch_player();
+    game.make_move(4); game.switch_player();
+    game.make_move(2); game.switch_player();
+    game.make_move(5); game.switch_player();
+    game.make_move(3);
+
     REQUIRE(game.check_win() == true);
 }
 
 TEST_CASE("Vertical win is detected") {
-    TicTacToe game;
-    // X takes left column
-    game.make_move(1);
-    game.make_move(2); // O
-    game.make_move(4);
-    game.make_move(5); // O
-    game.make_move(7); // X wins
+    HumanPlayer p1('X');
+    HumanPlayer p2('O');
+    TicTacToe game(&p1, &p2);
+
+    game.make_move(1); game.switch_player();
+    game.make_move(2); game.switch_player();
+    game.make_move(4); game.switch_player();
+    game.make_move(5); game.switch_player();
+    game.make_move(7);
+
     REQUIRE(game.check_win() == true);
 }
 
 TEST_CASE("Diagonal win is detected") {
-    TicTacToe game;
-    game.make_move(1); // X
-    game.make_move(2); // O
-    game.make_move(5); // X
-    game.make_move(3); // O
-    game.make_move(9); // X wins diagonally
+    HumanPlayer p1('X');
+    HumanPlayer p2('O');
+    TicTacToe game(&p1, &p2);
+
+    game.make_move(1); game.switch_player();
+    game.make_move(2); game.switch_player();
+    game.make_move(5); game.switch_player();
+    game.make_move(3); game.switch_player();
+    game.make_move(9);
+
     REQUIRE(game.check_win() == true);
 }
 
-TEST_CASE("Draw game is detected") {
-    TicTacToe game;
+TEST_CASE("Draw is detected") {
+    HumanPlayer p1('X');
+    HumanPlayer p2('O');
+    TicTacToe game(&p1, &p2);
 
-    // Fill board with no winner
-    game.make_move(1); // X
-    game.switch_player();
-    game.make_move(2); // O
-    game.switch_player();
-    game.make_move(3); // X
-    game.switch_player();
-    game.make_move(5); // O
-    game.switch_player();
-    game.make_move(4); // X
-    game.switch_player();
-    game.make_move(6); // O
-    game.switch_player();
-    game.make_move(8); // X
-    game.switch_player();
-    game.make_move(7); // O
-    game.switch_player();
-    game.make_move(9); // X
+    game.make_move(1); game.switch_player();
+    game.make_move(2); game.switch_player();
+    game.make_move(3); game.switch_player();
+    game.make_move(5); game.switch_player();
+    game.make_move(4); game.switch_player();
+    game.make_move(6); game.switch_player();
+    game.make_move(8); game.switch_player();
+    game.make_move(7); game.switch_player();
+    game.make_move(9);
 
     REQUIRE(game.check_draw() == true);
 }
-TEST_CASE("Computer takes first available spot") {
-    TicTacToe game;
 
-    // Force board state
-    game.make_move(1); // X
-    game.switch_player();
-    game.make_move(2); // O
-    game.switch_player();
-
-    game.computer_move();
-
-    // computer should take position 3 (first available)
-    bool isvalid = (game.get_current_player() == 'X' || game.get_current_player() == 'O');
-    REQUIRE(isvalid);
-}
-TEST_CASE("Computer move is valid and accepted") {
-    TicTacToe game;
+TEST_CASE("Computer picks first available move") {
+    HumanPlayer p1('X');
+    ComputerPlayer p2('O');
+    TicTacToe game(&p1, &p2);
 
     game.make_move(1); // X
     game.switch_player();
 
-    game.computer_move(); // O should move
+    game.play_turn(); // computer move
 
-    // next move should NOT be able to overwrite first available spot used
-    bool isvalid = (game.make_move(2) == false || game.make_move(1) == false);
-    REQUIRE(isvalid);
+    // position 2 should now be taken
+    REQUIRE(game.make_move(2) == false);
 }
-TEST_CASE("Computer can go first") {
-    TicTacToe game;
 
-    // simulate computer first
-    game.computer_move();
+TEST_CASE("Computer does not overwrite moves") {
+    HumanPlayer p1('X');
+    ComputerPlayer p2('O');
+    TicTacToe game(&p1, &p2);
 
-    // first available is 1
-    REQUIRE(game.make_move(1) == false);
-}
-TEST_CASE("Computer does not overwrite existing move") {
-    TicTacToe game;
-
-    game.make_move(1); // X takes 1
+    game.make_move(1);
     game.switch_player();
 
-    game.computer_move(); // should skip 1 and take 2
+    game.play_turn(); // computer should take 2
 
     REQUIRE(game.make_move(1) == false);
 }

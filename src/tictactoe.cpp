@@ -3,93 +3,44 @@
 #include <iostream>
 #include <cctype>
 
-//helper function to trim string
-static std::string trim(const std::string& str) {
-    size_t start = 0;
-    size_t end = str.length();
-
-    while(start < end && std::isspace(str[start])) {
-        start++;
-    }
-
-    while(end > start && std::isspace(str[end - 1])) {
-        end--;
-    }
-
-    return str.substr(start, end - start);
-}
+#include "computerplayer.hpp"
 
 // Your code goes here
-TicTacToe::TicTacToe() {
-    current_player = 'X';
+TicTacToe::TicTacToe(Player* p1, Player* p2) {
+    player1 = p1;
+    player2 = p2;
+    current_player = player1;
+    last_player = nullptr;
 }
 
-char TicTacToe::get_current_player() const {
-    return current_player;
+Player* TicTacToe::get_last_player() const {
+    return last_player;
 }
 
-short TicTacToe::get_valid_move() const {
-    std::string input;
-    short move = -1;
-    bool valid = false;
-
-    while(!valid) {
-        std::getline(std::cin, input);
-
-        input = trim(input);
-
-        valid = true;
-
-        if(input.empty()) {
-            valid = false;
-        }
-        else {
-            try {
-                size_t pos;
-                short temp = static_cast<short>(std::stoi(input, &pos));
-
-                // ensure no extra characters (e.g. "5 6")
-                if(pos != input.length()) {
-                    valid = false;
-                }
-                else {
-                    move = temp;
-                }
-            }
-            catch (...) {
-                valid = false;
-            }
-        }
-
-        if (!valid) {
-            std::cout<<"Invalid input. Please enter a number from 1-9:";
-            move =  -1;
-        }
-    }
-    return move;
+void TicTacToe::display_board() const {
+    board.display();
 }
 
 bool TicTacToe::make_move(short position) {
     bool success = false;
     if(board.is_valid_move(position)) {
-        board.place_mark(position, current_player);
+        board.place_mark(position, current_player->get_symbol());
         success = true;
-    }
 
+        last_player = current_player;
+    }
     return success;
 }
 
 void TicTacToe::switch_player() {
-    if(current_player == 'X') {
-        current_player = 'O';
+    last_player = current_player;
+
+    if(current_player == player1) {
+        current_player = player2;
     }
     else {
-        current_player = 'X';
+        current_player = player1;
     }
-}
-
-void TicTacToe::display_board() const {
-    board.display();
 }
 
 bool TicTacToe::check_draw() const {
@@ -100,14 +51,9 @@ bool TicTacToe::check_win() const {
     bool win = false;
 
     int wins[8][3] = {
-        {0,1,2},
-        {3,4,5},
-        {6,7,8},
-        {0,3,6},
-        {1,4,7},
-        {2,5,8},
-        {0,4,8},
-        {2,4,6}
+        {0,1,2},{3,4,5},{6,7,8},
+        {0,3,6},{1,4,7},{2,5,8},
+        {0,4,8},{2,4,6}
     };
 
     for(short i = 0; i < 8; i++) {
@@ -118,15 +64,28 @@ bool TicTacToe::check_win() const {
         if(a == b && b == c)
             win = true;
     }
-
     return win;
 }
 
-void TicTacToe::computer_move() {
-    for(short i = 0; i <= 9; i++) {
-        if(board.is_valid_move(i)) {
-            board.place_mark(i, current_player);
-            return;
-        }
+bool TicTacToe::play_turn() {
+    bool success = true;
+    display_board();
+
+    if (dynamic_cast<ComputerPlayer*>(current_player)) {
+        std::cout << "Computer is making a move...\n";
     }
+    else {
+        std::cout << "Player "
+              << current_player->get_symbol()
+              << ", enter your move: ";
+    }
+
+    short move = current_player->get_move(board);
+
+    if (!make_move(move)) {
+        std::cout << "Invalid move. Try again. " << std::endl;
+        success = false;
+    }
+
+    return success;
 }

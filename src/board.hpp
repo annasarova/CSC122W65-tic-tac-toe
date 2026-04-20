@@ -1,3 +1,5 @@
+#ifndef BOARD_HPP
+#define BOARD_HPP
 #include <vector>
 
 class Board {
@@ -17,3 +19,5 @@ public:
 
     char get_cell(short index) const;
 };
+
+#endif
