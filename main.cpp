@@ -34,6 +34,26 @@ int main() {
       exit_game = true;
     }
     else {
+      bool trap_enabled = false;
+      short trap_choice;
+
+      std::cout << "\nWould you like to include a trap cell in your game?\n";
+      std::cout << "1. Yes\n";
+      std::cout << "2. No\n";
+      std::cout << "What is your selection? ";
+      std::cin >> trap_choice;
+
+      while (std::cin.fail() || trap_choice < 1 || trap_choice > 2) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Invalid selection. Try again: ";
+        std::cin >> trap_choice;
+      }
+
+      trap_enabled = (trap_choice == 1);
+
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
       Player* p1;
       Player* p2;
       if (mode == 1) {
@@ -55,30 +75,28 @@ int main() {
       bool play_again = true;
 
       while(play_again) {
-        TicTacToe game(p1, p2);
+        TicTacToe game(p1, p2, trap_enabled);
         bool game_over = false;
 
         std::cout << "Board positions are numbered 1-9.\n";
 
         while(!game_over) {
-          bool valid_move = game.play_turn();
+          game.play_turn();
 
-          if (valid_move) {
-            if (game.check_win()) {
-              game.display_board();
-              std::cout << "Player "
-                        << game.get_last_player()->get_symbol()
-                        << " wins!\n";
-              game_over = true;
-            }
-            else if (game.check_draw()) {
-              game.display_board();
-              std::cout << "It's a draw!\n";
-              game_over = true;
-            }
-            else {
-              game.switch_player();
-            }
+          if (game.check_win()) {
+            game.display_board();
+            std::cout << "Player "
+                      << game.get_last_player()->get_symbol()
+                      << " wins!\n";
+            game_over = true;
+          }
+          else if (game.check_draw()) {
+            game.display_board();
+            std::cout << "It's a draw!\n";
+            game_over = true;
+          }
+          else {
+            game.switch_player();
           }
         }
 

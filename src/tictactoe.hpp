@@ -1,4 +1,4 @@
-#include <string>
+#include <cstdlib>
 #include "board.hpp"
 #include "player.hpp"
 
@@ -11,8 +11,11 @@ private:
     Player* current_player;
     Player* last_player;
 
+    bool trap_enabled;
+    short trap_cell;
+
 public:
-    TicTacToe(Player* p1, Player* p2);
+    TicTacToe(Player* p1, Player* p2, bool trap_enabled);
 
     Player* get_last_player() const;
 
@@ -27,4 +30,6 @@ public:
     bool check_draw() const;
 
     bool play_turn();
+
+    void generate_trap();
 };

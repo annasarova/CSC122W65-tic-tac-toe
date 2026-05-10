@@ -6,11 +6,18 @@
 #include "computerplayer.hpp"
 
 // Your code goes here
-TicTacToe::TicTacToe(Player* p1, Player* p2) {
+TicTacToe::TicTacToe(Player* p1, Player* p2,bool trap_enabled) {
     player1 = p1;
     player2 = p2;
     current_player = player1;
     last_player = nullptr;
+
+    this->trap_enabled = trap_enabled;
+    trap_cell = -1;
+
+    if (trap_enabled) {
+        generate_trap();
+    }
 }
 
 Player* TicTacToe::get_last_player() const {
@@ -23,7 +30,16 @@ void TicTacToe::display_board() const {
 
 bool TicTacToe::make_move(short position) {
     bool success = false;
-    if(board.is_valid_move(position)) {
+
+    // Trap check first
+    if (trap_enabled && position == trap_cell) {
+        std::cout << "Oh no! You set off the trap! "
+            << current_player->get_symbol()
+            << " loses their turn.\n";
+        last_player = current_player;
+        success = true; //turn consumed, but no move placed
+    }
+    else if(board.is_valid_move(position)) {
         board.place_mark(position, current_player->get_symbol());
         success = true;
 
@@ -61,7 +77,7 @@ bool TicTacToe::check_win() const {
         char b = board.get_cell(wins[i][1]);
         char c = board.get_cell(wins[i][2]);
 
-        if(a == b && b == c)
+        if(a == b && b == c && (a == 'X' || a == 'O'))
             win = true;
     }
     return win;
@@ -88,4 +104,9 @@ bool TicTacToe::play_turn() {
     }
 
     return success;
+}
+
+void TicTacToe::generate_trap() {
+    srand(time(nullptr));
+    trap_cell = (rand() % 9) + 1;
 }
